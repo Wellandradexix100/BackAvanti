@@ -13,6 +13,6 @@ router.get("/", listarOferta);
 
 router.post("/", verificarToken, criarOferta);
 router.put("/:id", verificarToken, atualizarOferta);
-router.delete("/id", verificarToken, deletarOferta);
+router.delete("/:id", verificarToken, deletarOferta);
 
 export default router;
