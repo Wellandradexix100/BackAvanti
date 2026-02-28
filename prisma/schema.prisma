@@ -33,7 +33,8 @@ model Pessoa {
   senhaHash     String
   ofertas       Oferta[]
   role          Role  @default(USER)
-
+  avatar_url    String?
+  capa_url      String?
   @@map("pessoas")
 }
 
