@@ -43,7 +43,7 @@ export const listarOferta = async (req, res) => {
       where: filtro,
       include: {
         pessoa: {
-          select: { nome: true, email: true, telefone: true },
+          select: { nome: true, email: true, telefone: true, avatar_url: true },
         },
       },
     });
@@ -111,5 +111,90 @@ export const deletarOferta = async (req, res) => {
     res
       .status(500)
       .json({ erro: "Erro ao deletar a oferta", detalhe: error.message });
+  }
+};
+
+export const adquirirOferta = async (req, res) => {
+  try {
+    const { oferta_id } = req.params;
+    const pessoa_id = req.usuarioId;
+
+    const oferta = await prisma.oferta.findUnique({
+      where: { id: Number(oferta_id) },
+    });
+
+    if (!oferta) {
+      return res.status(404).json({ erro: "Oferta não encontrada!" });
+    }
+
+    if (oferta.pessoa_id === pessoa_id) {
+      return res
+        .status(400)
+        .json({ erro: "Você não pode adquirir sua própria oferta!" });
+    }
+
+    const jaAdquiriu = await prisma.aquisicao.findFirst({
+      where: {
+        pessoa_id: pessoa_id,
+        oferta_id: Number(oferta_id),
+      },
+    });
+
+    if (jaAdquiriu) {
+      return res
+        .status(400)
+        .json({ erro: "Você já adquiriu esta oferta anteriormente!" });
+    }
+
+    const aquisicao = await prisma.aquisicao.create({
+      data: {
+        pessoa_id,
+        oferta_id: Number(oferta_id),
+      },
+    });
+
+    res.status(201).json({
+      mensagem: "Oferta adquirida com sucesso!",
+      aquisicao,
+    });
+  } catch (error) {
+    res.status(500).json({
+      erro: "Erro ao adquirir a oferta.",
+      detalhe: error.message,
+    });
+  }
+};
+
+export const listarMinhasAquisicoes = async (req, res) => {
+  try {
+    const pessoa_id = req.usuarioId;
+
+    const aquisicoes = await prisma.aquisicao.findMany({
+      where: { pessoa_id },
+      include: {
+        oferta: {
+          include: {
+            pessoa: {
+              select: {
+                nome: true,
+                email: true,
+                telefone: true,
+                avatar_url: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        criadoEm: "desc",
+      },
+    });
+
+    res.status(200).json(aquisicoes);
+  } catch (error) {
+    res.status(500).json({
+      erro: "Erro ao listar suas aquisições.",
+      detalhe: error.message,
+    });
   }
 };

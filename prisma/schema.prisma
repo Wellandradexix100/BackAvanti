@@ -32,6 +32,7 @@ model Pessoa {
   descricao     String?
   senhaHash     String
   ofertas       Oferta[]
+  aquisicoes    Aquisicao[]
   role          Role  @default(USER)
   avatar_url    String?
   capa_url      String?
@@ -46,6 +47,19 @@ model Oferta {
   nivel         Nivel
   pessoa_id     Int
   pessoa        Pessoa  @relation(fields: [pessoa_id], references: [id], onDelete: Cascade)
-
+  aquisicoes    Aquisicao[]
   @@map("ofertas")
+}
+
+model Aquisicao {
+  id        Int      @id @default(autoincrement())
+  pessoa_id Int
+  oferta_id Int
+  criadoEm  DateTime @default(now())
+  pessoa    Pessoa   @relation(fields: [pessoa_id], references: [id], onDelete: Cascade)
+  oferta    Oferta   @relation(fields: [oferta_id], references: [id], onDelete: Cascade)
+
+  @@unique([pessoa_id, oferta_id]) 
+  
+  @@map("aquisicoes")
 }
