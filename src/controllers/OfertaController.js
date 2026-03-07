@@ -26,20 +26,40 @@ export const criarOferta = async (req, res) => {
 
 export const listarOferta = async (req, res) => {
   try {
-    const { categoria, nivel, busca, pagina = 1, limite = 9 } = req.query;
+    const {
+      categoria,
+      nivel,
+      busca,
+      pagina = 1,
+      limite = 9,
+      usuario_id,
+    } = req.query;
     const page = parseInt(pagina);
     const take = parseInt(limite);
     const skip = (page - 1) * take;
     const filtro = {};
+
     if (categoria)
       filtro.categoria = { contains: categoria, mode: "insensitive" };
     if (nivel) filtro.nivel = nivel;
+
     if (busca) {
       filtro.OR = [
         { titulo: { contains: busca, mode: "insensitive" } },
         { descricao: { contains: busca, mode: "insensitive" } },
+        { categoria: { contains: busca, mode: "insensitive" } },
+        { pessoa: { nome: { contains: busca, mode: "insensitive" } } },
       ];
     }
+
+    if (usuario_id) {
+      filtro.aquisicoes = {
+        none: {
+          pessoa_id: Number(usuario_id),
+        },
+      };
+    }
+
     const [ofertas, totalRegistros] = await Promise.all([
       prisma.oferta.findMany({
         where: filtro,
@@ -61,7 +81,9 @@ export const listarOferta = async (req, res) => {
       }),
       prisma.oferta.count({ where: filtro }),
     ]);
+
     const totalPaginas = Math.ceil(totalRegistros / take);
+
     res.status(200).json({
       dados: ofertas,
       paginacao: {
