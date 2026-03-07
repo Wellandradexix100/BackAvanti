@@ -95,10 +95,10 @@ O servidor estará rodando em `http://localhost:3000`.
 
 ### Conhecimentos (Ofertas)
 
-- `GET /conhecimentos`: Lista as ofertas. Aceita filtros via Query Params (ex: `?categoria=Tecnologia&nivel=BASICO&busca=node`).
-- `POST /conhecimentos`: (Protegido) Cria uma nova oferta vinculada ao usuário logado.
-- `PUT /conhecimentos/:id`: (Protegido) Atualiza uma oferta (apenas pelo dono).
-- `DELETE /conhecimentos/:id`: (Protegido) Deleta uma oferta (apenas pelo dono).
+- `GET /ofertas`: Lista as ofertas. Aceita filtros via Query Params (ex: `?categoria=Tecnologia&nivel=BASICO&busca=node`).
+- `POST /ofertas`: (Protegido) Cria uma nova oferta vinculada ao usuário logado.
+- `PUT /ofertas/:id`: (Protegido) Atualiza uma oferta (apenas pelo dono).
+- `DELETE /ofertas/:id`: (Protegido) Deleta uma oferta (apenas pelo dono).
 
 ---
 
